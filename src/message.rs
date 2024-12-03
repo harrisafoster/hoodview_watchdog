@@ -9,7 +9,7 @@ pub mod message {
     ) -> String {
         log::info!("Building message...");
         let mut message: String =
-            "<section style=\"box-sizing: border-box; max-width: fit-content;\"><p>Hey there Dad, </p>".to_string();
+            "<section style=\"box-sizing: border-box; max-width: fit-content;\"><p>Hey there potential campsite holder, </p>".to_string();
 
         if has_non_empty_vector(&all_site_availability) {
             for site in all_site_availability {

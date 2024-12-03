@@ -2,24 +2,16 @@ pub mod scan {
     use crate::constants::constants::ALL_SITE_URLS;
     use crate::structs::structs::CalendarAvailabilityDate;
     use std::error::Error;
-    use chrono::{Datelike, Local};
-    use thirtyfour::prelude::*;
-    use webdriver_client::{ chrome::ChromeDriver, Driver };
+    use thirtyfour::prelude::ElementWaitable;
+    use thirtyfour::{By, WebDriver, WebElement};
     use std::time::Duration;
     use std::thread;
 
-    pub async fn scrape_all() -> Result<
-        Vec<(i32, Vec<CalendarAvailabilityDate>)>,
-        Box<dyn Error + Send + Sync>
-    > {
+    pub async fn scrape_all(
+        driver: &WebDriver
+    ) -> Result<Vec<(i32, Vec<CalendarAvailabilityDate>)>, Box<dyn Error + Send + Sync>> {
         log::info!("Commencing scraping...");
         let mut all_site_availability: Vec<(i32, Vec<CalendarAvailabilityDate>)> = Vec::new();
-        let chromedriver: ChromeDriver = ChromeDriver::spawn().unwrap();
-        let session_url: String = chromedriver.url().to_owned();
-        let mut caps: thirtyfour::ChromeCapabilities = DesiredCapabilities::chrome();
-        caps.add_arg("--headless=new")?;
-        caps.add_arg("--start-maximized")?;
-        let driver: WebDriver = WebDriver::new(session_url, caps).await?;
         for site_url in ALL_SITE_URLS {
             log::info!("Attempting to scrape site {}", site_url.site_number);
             all_site_availability.push((
@@ -28,9 +20,6 @@ pub mod scan {
             ));
             log::info!("Site {} scraped.", site_url.site_number);
         }
-
-        // close the browser and release its resourcesS
-        driver.quit().await?;
 
         Ok(all_site_availability)
     }
@@ -44,10 +33,7 @@ pub mod scan {
         let mut calendar_availability_dates: Vec<CalendarAvailabilityDate> = Vec::new();
 
         for n in 0..12 {
-            let today: chrono::DateTime<Local> = Local::now();
-            let current_month: chrono::DateTime<Local> = today.with_month0((today.month0() + n) % 12).unwrap();
-            let month_name: String = current_month.format("%B").to_string();
-            log::info!("Current month: {}, {}", month_name, current_month.year());
+            log::info!("Iteration: {}", n + 1);
             for available_date_element in driver.find_all(By::Css(".available")).await? {
                 // possible classes: available, blocked, checkout, notYetReleased, currentReservation
                 let label: String = available_date_element.attr("aria-label").await?.unwrap();
