@@ -70,6 +70,8 @@ pub mod message {
         message.push_str(
             "<br>May the odds be ever in your favor...<br><br> -Ya main man Harris</section>"
         );
+        let version_message: String = format!("Brought to you by the HoodviewWatchdog version: {}", env!("CARGO_PKG_VERSION"));
+        message.push_str(&version_message);
         log::info!("Message built.");
         message
     }

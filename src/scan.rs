@@ -3,7 +3,7 @@ pub mod scan {
     use crate::structs::structs::CalendarAvailabilityDate;
     use std::error::Error;
     use thirtyfour::prelude::ElementWaitable;
-    use thirtyfour::{By, WebDriver, WebElement};
+    use thirtyfour::{ By, WebDriver, WebElement };
     use std::time::Duration;
     use std::thread;
 
@@ -57,6 +57,7 @@ pub mod scan {
                 &driver
             ).await;
             next_button.wait_until().displayed().await?;
+            next_button.scroll_into_view().await?;
             next_button.wait_until().clickable().await?;
             next_button.click().await?;
         }

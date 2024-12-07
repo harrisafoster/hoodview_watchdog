@@ -1,16 +1,18 @@
 use scan::scan::scrape_all;
 use structs::structs::CalendarAvailabilityDate;
-use thirtyfour::{ ChromiumLikeCapabilities, DesiredCapabilities, WebDriver };
+use thirtyfour::{ DesiredCapabilities, WebDriver };
 use tokio;
-use webdriver_client::chrome::ChromeDriver;
+use webdriver_client::firefox::GeckoDriver;
 use webdriver_client::Driver;
 pub mod notify;
 pub mod scan;
 pub mod structs;
 pub mod message;
 pub mod constants;
+pub mod state;
 use crate::notify::notify::send_notification;
 use crate::message::message::generate_message;
+use crate::state::state::message_changed;
 use chrono::prelude::*;
 use std::{ thread, time };
 
@@ -28,14 +30,13 @@ async fn main() {
     log4rs::init_file("log4rs.yml", Default::default()).unwrap();
     log::info!("Starting main thread...");
 
-    // Set up chromedriver
-    let chromedriver: ChromeDriver = ChromeDriver::spawn().unwrap();
-    let session_url: String = chromedriver.url().to_owned();
+    // Set up gecko driver
+    let gecko_driver: GeckoDriver = GeckoDriver::spawn().unwrap();
+    let session_url: String = gecko_driver.url().to_owned();
 
     loop {
-        let mut caps: thirtyfour::ChromeCapabilities = DesiredCapabilities::chrome();
-        caps.add_arg("--headless=new").unwrap();
-        caps.add_arg("--start-maximized").unwrap();
+        let mut caps: thirtyfour::FirefoxCapabilities = DesiredCapabilities::firefox();
+        caps.add_arg("--headless").unwrap();
         let driver: WebDriver = WebDriver::new(&session_url, caps).await.unwrap();
         let available_dates: Vec<(i32, Vec<CalendarAvailabilityDate>)> = scrape_all(
             &driver
@@ -44,10 +45,12 @@ async fn main() {
         let mut subject: String = "Hoodview campsites bruh! Notified: ".to_string();
         let now: String = Local::now().format("%Y-%m-%d %H:%M:%S GMT:%Z").to_string();
         subject.push_str(&now);
-        if message != "None" {
+
+        let message_is_new: bool = message_changed(&message).unwrap();
+        if message != "None" && message_is_new == true {
             send_notification(subject, message);
         } else {
-            log::warn!("No availability found :(");
+            log::warn!("No change in availability since the last run.");
         }
         driver.quit().await.unwrap();
 
