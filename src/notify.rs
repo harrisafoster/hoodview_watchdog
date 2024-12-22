@@ -2,8 +2,23 @@ pub mod notify {
     use lettre::message::header::ContentType;
     use lettre::transport::smtp::authentication::Credentials;
     use lettre::{ Message, SmtpTransport, Transport };
-    use dotenv;
 
+    /// Sends an email notification with the provided subject and message.
+
+    /// This function sends an email notification to a list of recipients specified in the
+    /// `HVWD_RECIPIENTS` environment variable. It uses the credentials from
+    /// `HVWD_USERNAME` and `HVWD_APP_PASSWORD` environment variables to connect to
+    /// Gmail's SMTP server.
+
+    /// # Arguments
+    ///
+    /// * `subject`: The subject line of the email.
+    /// * `message`: The body content of the email (HTML format).
+
+    /// # Errors
+    ///
+    /// This function can return various errors related to environment variables, email
+    /// construction, or sending the email through SMTP.
     pub fn send_notification(subject: String, message: String) {
         dotenv::dotenv().ok();
 
@@ -21,12 +36,15 @@ pub mod notify {
             panic!("Missing required environment variable: HVWD_RECIPIENTS");
         });
         log::info!("Secret info successfully retrieved.");
-        
+
         hvwd_recipients.split(",").for_each(|hvwd_recipient| {
             let recipient: String = format!("Hopeful Campsite Reserver <{}>", hvwd_recipient);
             let sender: String = format!("The Hoodview Watchdog <{}>", &hvwd_username);
-            let creds: Credentials = Credentials::new(hvwd_username.to_string(), hvwd_app_password.to_string());
-        
+            let creds: Credentials = Credentials::new(
+                hvwd_username.to_string(),
+                hvwd_app_password.to_string()
+            );
+
             log::info!("Attempting to send email notification to {}", hvwd_recipient);
             let email: Message = Message::builder()
                 .from(sender.parse().unwrap())
