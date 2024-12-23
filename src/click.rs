@@ -37,6 +37,7 @@ pub mod click {
                     if retries == 0 {
                         log::error!("Maximum number of retries exceeded.");
                         println!("{:?}", e);
+                        return Err(e);
                     }
                     log::warn!("Retries remaining: {}", retries);
                     retries -= 1;
