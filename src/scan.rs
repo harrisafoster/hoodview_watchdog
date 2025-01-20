@@ -100,7 +100,7 @@ pub mod scan {
         {
             // Check if the found dates are within the desired month range
             if
-                days > 4 &&
+                days >= 3 &&
                 start_date.month() >= 7 &&
                 start_date.month() <= 8 &&
                 end_date.month() >= 7 &&
