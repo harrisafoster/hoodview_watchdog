@@ -23,5 +23,5 @@ pub mod constants {
     pub const SITE_EMPTY: SiteURL = SiteURL { site_number: 0, url: ""};
 
     /// Array containing constants for all campsite URLs (excluding SITE_EMPTY).
-    pub const ALL_SITE_URLS: [SiteURL<'_>; 6] = [SITE26, SITE24, SITE23, SITE6, SITE5, SITE4];
+    pub const ALL_SITE_URLS: [SiteURL<'_>; 6] = [SITE4, SITE6, SITE23, SITE24, SITE26, SITE5];
 }

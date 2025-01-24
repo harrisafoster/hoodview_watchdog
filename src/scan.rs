@@ -100,11 +100,11 @@ pub mod scan {
         {
             // Check if the found dates are within the desired month range
             if
-                days >= 3 &&
-                start_date.month() >= 7 &&
-                start_date.month() <= 8 &&
-                end_date.month() >= 7 &&
-                end_date.month() <= 8
+                days >= 2 &&
+                start_date.month() >= 6 &&
+                start_date.month() <= 9 &&
+                end_date.month() >= 6 &&
+                end_date.month() <= 9
             {
                 reserved_dates = reserve_sites(
                     driver,
