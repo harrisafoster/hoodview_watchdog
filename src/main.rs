@@ -2,7 +2,7 @@ use thirtyfour::{ DesiredCapabilities, WebDriver };
 use tokio;
 use webdriver_client::firefox::GeckoDriver;
 use webdriver_client::Driver;
-use chrono::{ prelude::*, Duration };
+use chrono::prelude::*;
 use std::thread;
 pub mod notify;
 pub mod scan;
@@ -53,11 +53,17 @@ async fn main() {
         }
 
         // Calculate sleep duration to run at the next hour on the hour.
-        let now: DateTime<Local> = Local::now();
-        let next_hour: DateTime<Local> = (now + Duration::hours(1)).with_minute(0).unwrap().with_second(0).unwrap().with_nanosecond(0).unwrap();
-        let duration: std::time::Duration = next_hour.signed_duration_since(now).to_std().unwrap();
+        // let now: DateTime<Local> = Local::now();
+        // let next_hour: DateTime<Local> = (now + Duration::hours(1)).with_minute(0).unwrap().with_second(0).unwrap().with_nanosecond(0).unwrap();
+        // let duration: std::time::Duration = next_hour.signed_duration_since(now).to_std().unwrap();
 
-        log::warn!("Sleeping for {} seconds", duration.as_secs());
-        thread::sleep(duration);
+        // Calculate sleep duration to run at the next ten minute mark.
+        let now: DateTime<Local> = Local::now();
+        let current_minute: u32 = now.minute();
+        let minutes_to_next_10: u32 = (10 - (current_minute % 10)) % 10;
+        let duration: u64 = (minutes_to_next_10 as u64) * 60; // Convert minutes to seconds
+
+        log::warn!("Sleeping for {} seconds", duration);
+        thread::sleep(std::time::Duration::from_secs(duration));
     }
 }
